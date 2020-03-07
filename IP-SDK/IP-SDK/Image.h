@@ -20,6 +20,7 @@ namespace sdk
 		virtual ImageBuilderInterface& SetBpp(size_t value) = 0;
 		virtual ImageBuilderInterface& SetComponenetCount(size_t value) = 0;
 		virtual ImageBuilderInterface& SetZero(bool value) = 0;
+		virtual ImageBuilderInterface& SetSrcData(void* value) = 0;
 		virtual Image* Build() = 0;
 	};
 
@@ -32,6 +33,7 @@ namespace sdk
 		ImageBuilderInterface& SetBpp(size_t value) override;
 		ImageBuilderInterface& SetComponenetCount(size_t value) override;
 		ImageBuilderInterface& SetZero(bool value) override;
+		ImageBuilderInterface& SetSrcData(void* value) override;
 		Image* Build() override;
 	private:
 		Image* _pImage{ nullptr };
@@ -60,6 +62,7 @@ namespace sdk
 
 	private:
 		Buffer* _pBuffer{ nullptr };
+		void* _pSrcData{ nullptr };
 		size_t _nWidth{ 0 };
 		size_t _nHeight{ 0 };
 		size_t _nBpp{ 0 };

@@ -42,7 +42,7 @@ void Image::Create(bool setZero)
 	if (_pBuffer == nullptr) {
 		size_t nBufferSize = _nRowByte * _nHeight;
 		_pBuffer = new Buffer(nBufferSize);
-		_pBuffer->Create(setZero);
+		_pBuffer->Create(_pSrcData, setZero);
 	}
 }
 
@@ -80,6 +80,12 @@ ImageBuilderInterface& ImageBuilder::SetComponenetCount(size_t value)
 ImageBuilderInterface& ImageBuilder::SetZero(bool value) 
 {
 	_bSetZero = value;
+	return *this;
+}
+
+ImageBuilderInterface& ImageBuilder::SetSrcData(void* value)
+{
+	_pImage->_pSrcData = value;
 	return *this;
 }
 
