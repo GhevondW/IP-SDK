@@ -3,7 +3,7 @@ using namespace sdk;
 
 Image::~Image()
 {
-	if (_pBuffer != nullptr) {
+	if (_pBuffer != nullptr && !_bIsWrapped) {
 		delete _pBuffer;
 	}
 }
@@ -42,11 +42,11 @@ void Image::Create(bool setZero)
 	if (_pBuffer == nullptr) {
 		size_t nBufferSize = _nRowByte * _nHeight;
 		_pBuffer = new Buffer(nBufferSize);
-		_pBuffer->Create(_pSrcData, setZero);
+		_pBuffer->Create(_pSrcData, _bIsWrapped, setZero);
 	}
 }
 
-//bulder
+//builder
 
 ImageBuilder::ImageBuilder()
 {
@@ -86,6 +86,12 @@ ImageBuilderInterface& ImageBuilder::SetZero(bool value)
 ImageBuilderInterface& ImageBuilder::SetSrcData(void* value)
 {
 	_pImage->_pSrcData = value;
+	return *this;
+}
+
+ImageBuilderInterface& ImageBuilder::Wrap()
+{
+	_pImage->_bIsWrapped = true;
 	return *this;
 }
 

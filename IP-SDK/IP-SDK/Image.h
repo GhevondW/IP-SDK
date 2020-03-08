@@ -21,6 +21,7 @@ namespace sdk
 		virtual ImageBuilderInterface& SetComponenetCount(size_t value) = 0;
 		virtual ImageBuilderInterface& SetZero(bool value) = 0;
 		virtual ImageBuilderInterface& SetSrcData(void* value) = 0;
+		virtual ImageBuilderInterface& Wrap() = 0;
 		virtual Image* Build() = 0;
 	};
 
@@ -34,6 +35,7 @@ namespace sdk
 		ImageBuilderInterface& SetComponenetCount(size_t value) override;
 		ImageBuilderInterface& SetZero(bool value) override;
 		ImageBuilderInterface& SetSrcData(void* value) override;
+		ImageBuilderInterface& Wrap() override;
 		Image* Build() override;
 	private:
 		Image* _pImage{ nullptr };

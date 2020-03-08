@@ -7,17 +7,17 @@
 
 #define DEBUG_PRINT(str) if(DEBUG) printf ("%s \n", str);
 
-void* operator new(size_t nSize)
-{
-	DEBUG_PRINT("---new---");
-	return (void*)malloc(nSize);
-}
-
-void operator delete(void* p, int iSize)
-{
-	DEBUG_PRINT("---delete---");
-	free(p);
-}
+//void* operator new(size_t nSize)
+//{
+//	DEBUG_PRINT("---new---");
+//	return (void*)malloc(nSize);
+//}
+//
+//void operator delete(void* p, int iSize)
+//{
+//	DEBUG_PRINT("---delete---");
+//	free(p);
+//}
 
 
 #include "TDataTypes.h"

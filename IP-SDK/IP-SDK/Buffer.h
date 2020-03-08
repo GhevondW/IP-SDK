@@ -19,7 +19,7 @@ namespace sdk
 		Buffer* DeepCopyPtr(const Buffer& other);
 		Buffer DeepCopy(const Buffer& other);
 		void* GetData();
-		void Create(void* pSrcDara = nullptr, bool bSetZero = false);
+		void Create(void* pSrcDara = nullptr, bool bWrap = false, bool bSetZero = false);
 
 	private:
 		void* _pData{nullptr};

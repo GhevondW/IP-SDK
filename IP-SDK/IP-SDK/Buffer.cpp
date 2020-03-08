@@ -32,16 +32,22 @@ void* Buffer::GetData() {
 	return _pData;
 }
 
-void Buffer::Create(void* pSrcData, bool bSetZero) {
+void Buffer::Create(void* pSrcData, bool bWrap, bool bSetZero) {
 	if (_pData == nullptr && _nBufferSize > 0) {
-		_pData = (void*)malloc(_nBufferSize);
-		if (_pData != nullptr) {
-			if (pSrcData != nullptr) {
-				memcpy(_pData, pSrcData, _nBufferSize);
+		_bIsWrapped = bWrap;
+		if (!_bIsWrapped) {
+			_pData = (void*)malloc(_nBufferSize);
+			if (_pData != nullptr) {
+				if (pSrcData != nullptr) {
+					memcpy(_pData, pSrcData, _nBufferSize);
+				}
+				else if (bSetZero) {
+					memset(_pData, 0, _nBufferSize);
+				}
 			}
-			else if (bSetZero) {
-				memset(_pData, 0, _nBufferSize);
-			}
+		}
+		else {
+			_pData = pSrcData;
 		}
 	}
 }
