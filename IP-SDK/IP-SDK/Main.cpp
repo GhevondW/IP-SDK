@@ -10,6 +10,23 @@
 
 using namespace sdk;
 
+void ProcessImage(sdk::Image* src)
+{
+	int iWidth = src->GetWidth();
+	int iHeight = src->GetHeight();
+
+	for (int y = 0; y < iHeight; y++)
+	{
+		for (int x = 0; x < iWidth; x++)
+		{
+			src->at<Pixel24>(x, y)[0] = 0;
+			src->at<Pixel24>(x, y)[1] = 0;
+			src->at<Pixel24>(x, y)[2] = 255;
+		}
+	}
+
+}
+
 int main() 
 {
 	/*
@@ -40,6 +57,20 @@ int main()
 	*/
 	
 	cv::Mat img = cv::imread("test.jpg");
+	int iWidth = img.cols;
+	int iHeight = img.rows;
+	int iChannelsCount = img.channels();
+	void* pData = (void*)img.data;
+	sdk::Image* sdkImg = sdk::Image::Make()
+		.SetBpp(1)
+		.SetComponenetCount(iChannelsCount)
+		.SetWidth(iWidth)
+		.SetHeight(iHeight)
+		.SetSrcData(pData)
+		.Wrap()
+		.Build();
+
+	ProcessImage(sdkImg);
 
 	cv::namedWindow("image", cv::WINDOW_NORMAL);
 	cv::imshow("image", img);

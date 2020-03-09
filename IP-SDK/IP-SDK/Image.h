@@ -57,7 +57,23 @@ namespace sdk
 		Image(const Image& other);
 		Image(Image&& other);
 
+		template<typename DATA_TYPE>
+		DATA_TYPE& at(const size_t x, const size_t y) {
+			size_t dp = y * GetWidth() + x;
+			DATA_TYPE* pBegin = (DATA_TYPE*)_pBuffer->GetData();
+			pBegin += dp;
+			return *pBegin;
+		}
+
+		inline size_t GetWidth() const { return _nWidth; }
+		inline size_t GetHeight() const { return _nHeight; }
+		inline size_t GetRowByte() const { return _nRowByte; }
+		inline size_t GetBpp() const { return _nBpp; }
+		inline size_t GetComponentCount() const { return _nComponentCount; }
+		inline bool IsWrapped() const { return _bIsWrapped; }
+
 	private:
+
 		Image() = default;
 		void Create(bool setZero = false);
 		void SetRowByte();
