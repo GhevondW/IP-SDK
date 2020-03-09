@@ -38,7 +38,7 @@ int main()
 	}
 	printf("Loaded image with a width of %dpx, a height of %dpx and %d channels\n", iWidth, iHeight, iChannels);
 	*/
-
+	
 	cv::Mat img = cv::imread("test.jpg");
 
 	cv::namedWindow("image", cv::WINDOW_NORMAL);
