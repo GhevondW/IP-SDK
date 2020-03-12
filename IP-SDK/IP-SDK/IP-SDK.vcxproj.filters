@@ -1,48 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="SDK Data Types">
-      <UniqueIdentifier>{9f4e1de1-07f1-42b6-b923-8acdcd826607}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SDK Data Structs">
-      <UniqueIdentifier>{a983175d-d7a8-480c-b7f0-dc9be1b58a52}</UniqueIdentifier>
-    </Filter>
+    <ClInclude Include="src\Common\GlobalDefines.h" />
+    <ClInclude Include="src\Data Structures\Buffer.h" />
+    <ClInclude Include="src\Data Structures\Image.h" />
+    <ClInclude Include="src\Data Structures\TDataTypes.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Image.cpp">
-      <Filter>SDK Data Structs</Filter>
-    </ClCompile>
-    <ClCompile Include="Buffer.cpp">
-      <Filter>SDK Data Structs</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="GlobalDefines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TDataTypes.h">
-      <Filter>SDK Data Types</Filter>
-    </ClInclude>
-    <ClInclude Include="Image.h">
-      <Filter>SDK Data Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="Buffer.h">
-      <Filter>SDK Data Structs</Filter>
-    </ClInclude>
+    <ClCompile Include="src\Data Structures\Buffer.cpp" />
+    <ClCompile Include="src\Data Structures\Image.cpp" />
+    <ClCompile Include="src\Entry Point\Main.cpp" />
   </ItemGroup>
 </Project>

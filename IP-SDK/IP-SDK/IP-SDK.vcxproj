@@ -19,15 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Buffer.cpp" />
-    <ClCompile Include="Image.cpp" />
-    <ClCompile Include="Main.cpp" />
+    <ClInclude Include="src\Common\GlobalDefines.h" />
+    <ClInclude Include="src\Data Structures\Buffer.h" />
+    <ClInclude Include="src\Data Structures\Image.h" />
+    <ClInclude Include="src\Data Structures\TDataTypes.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Buffer.h" />
-    <ClInclude Include="GlobalDefines.h" />
-    <ClInclude Include="Image.h" />
-    <ClInclude Include="TDataTypes.h" />
+    <ClCompile Include="src\Data Structures\Buffer.cpp" />
+    <ClCompile Include="src\Data Structures\Image.cpp" />
+    <ClCompile Include="src\Entry Point\Main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -98,7 +98,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\opencv\include;$(SolutionDir)Dependencies\std_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\opencv\include;$(SolutionDir)IP-SDK\src\Data Structures;$(SolutionDir)IP-SDK\src\Common;$(SolutionDir)Dependencies\std_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -113,7 +113,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\opencv\include;$(SolutionDir)Dependencies\std_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\opencv\include;$(SolutionDir)IP-SDK\src\Data Structures;$(SolutionDir)IP-SDK\src\Common;$(SolutionDir)Dependencies\std_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\opencv\include;$(SolutionDir)Dependencies\std_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\opencv\include;$(SolutionDir)IP-SDK\src\Data Structures;$(SolutionDir)IP-SDK\src\Common;$(SolutionDir)Dependencies\std_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,7 +149,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\opencv\include;$(SolutionDir)Dependencies\std_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\opencv\include;$(SolutionDir)IP-SDK\src\Data Structures;$(SolutionDir)IP-SDK\src\Common;$(SolutionDir)Dependencies\std_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
