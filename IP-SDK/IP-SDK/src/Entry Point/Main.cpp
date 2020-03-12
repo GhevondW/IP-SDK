@@ -7,6 +7,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#include "Header.h"
 
 using namespace sdk;
 
@@ -56,6 +57,7 @@ int main()
 	printf("Loaded image with a width of %dpx, a height of %dpx and %d channels\n", iWidth, iHeight, iChannels);
 	*/
 	
+	/*
 	cv::Mat img = cv::imread("test.jpg");
 	int iWidth = img.cols;
 	int iHeight = img.rows;
@@ -75,5 +77,9 @@ int main()
 	cv::namedWindow("image", cv::WINDOW_NORMAL);
 	cv::imshow("image", img);
 	cv::waitKey(0);
+	*/
+
+	pen::foo();
+
 	return 0;
 }

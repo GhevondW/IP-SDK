@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.29519.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IP-SDK", "IP-SDK\IP-SDK.vcxproj", "{963F2B5F-5675-4F21-94B0-9A4312F8AA76}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PenLib", "PenLib\PenLib.vcxproj", "{25EA6777-CF41-4D67-840D-CF5D7FAEF176}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{963F2B5F-5675-4F21-94B0-9A4312F8AA76}.Release|x64.Build.0 = Release|x64
 		{963F2B5F-5675-4F21-94B0-9A4312F8AA76}.Release|x86.ActiveCfg = Release|Win32
 		{963F2B5F-5675-4F21-94B0-9A4312F8AA76}.Release|x86.Build.0 = Release|Win32
+		{25EA6777-CF41-4D67-840D-CF5D7FAEF176}.Debug|x64.ActiveCfg = Debug|x64
+		{25EA6777-CF41-4D67-840D-CF5D7FAEF176}.Debug|x64.Build.0 = Debug|x64
+		{25EA6777-CF41-4D67-840D-CF5D7FAEF176}.Debug|x86.ActiveCfg = Debug|Win32
+		{25EA6777-CF41-4D67-840D-CF5D7FAEF176}.Debug|x86.Build.0 = Debug|Win32
+		{25EA6777-CF41-4D67-840D-CF5D7FAEF176}.Release|x64.ActiveCfg = Release|x64
+		{25EA6777-CF41-4D67-840D-CF5D7FAEF176}.Release|x64.Build.0 = Release|x64
+		{25EA6777-CF41-4D67-840D-CF5D7FAEF176}.Release|x86.ActiveCfg = Release|Win32
+		{25EA6777-CF41-4D67-840D-CF5D7FAEF176}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
