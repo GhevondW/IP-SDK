@@ -18,6 +18,15 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\CSVReader.h" />
+    <ClInclude Include="include\GDefines.h" />
+    <ClInclude Include="include\Row.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CSVReader.cpp" />
+    <ClCompile Include="src\Row.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{25EA6777-CF41-4D67-840D-CF5D7FAEF176}</ProjectGuid>
@@ -126,12 +135,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="include\Header.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\Source.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

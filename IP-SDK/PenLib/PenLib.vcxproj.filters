@@ -1,9 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="include\Header.h" />
+    <ClInclude Include="include\Row.h" />
+    <ClInclude Include="include\CSVReader.h" />
+    <ClInclude Include="include\GDefines.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Source.cpp" />
+    <ClCompile Include="src\Row.cpp" />
+    <ClCompile Include="src\CSVReader.cpp" />
   </ItemGroup>
 </Project>

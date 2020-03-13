@@ -7,8 +7,6 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#include "Header.h"
-
 using namespace sdk;
 
 void ProcessImage(sdk::Image* src)
@@ -79,7 +77,6 @@ int main()
 	cv::waitKey(0);
 	*/
 
-	pen::foo();
 
 	return 0;
 }
