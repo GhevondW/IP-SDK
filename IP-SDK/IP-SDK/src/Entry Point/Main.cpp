@@ -1,6 +1,7 @@
 #include "GlobalDefines.h"
 #include "Image.h"
 #include <opencv2/opencv.hpp>
+#include <CSVReader.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -77,6 +78,7 @@ int main()
 	cv::waitKey(0);
 	*/
 
+	pen::DirManager manager("C:\\Users\\Ghevond\\Desktop\\Utils\\SQL8.txt");
 
 	return 0;
 }

@@ -4,14 +4,14 @@
 #include "GDefines.h"
 #include <string>
 #include <vector>
-
-#if _WINDOWS_
-#include <windows.h>
-#endif
+#include <filesystem>
+#include <iostream>
 
 namespace pen
 {
 	
+	namespace fs = std::filesystem;
+
 	class DirManager
 	{
 		typedef std::vector<std::string> FPaths;
@@ -27,13 +27,15 @@ namespace pen
 
 		int GetTotalFilesCount() const;
 		int GetExtFilesCount() const;
-
+#if _DEBUG_
+		void PrintClassInfo();
+#endif // _DEBUG_
 	public _GETS_:
 
 		const std::string& GetDir() const;
 		const FPaths& GetFilesPath() const;
 		const std::string& GetExtension() const;
-		const FPaths GetFilesWithExt() const;
+		const FPaths& GetFilesWithExt() const;
 		bool IsDirExists() const;
 
 	public _SETS_:
@@ -50,6 +52,8 @@ namespace pen
 		std::string _Extension{};
 		bool _bDirExists{false};
 		FPaths _FilesPath{};
+		FPaths _FilesPathNeeded{};
+		fs::path _MainPath;
 	};
 
 

@@ -10,5 +10,6 @@
 
 #define _WINDOWS_ 1
 #define _LINUX_ 0
+#define _DEBUG_ 1
 
 #endif // !_GDEFS_H_
