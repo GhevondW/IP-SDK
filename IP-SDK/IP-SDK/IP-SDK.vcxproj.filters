@@ -5,6 +5,8 @@
     <ClInclude Include="src\Data Structures\Buffer.h" />
     <ClInclude Include="src\Data Structures\Image.h" />
     <ClInclude Include="src\Data Structures\TDataTypes.h" />
+    <ClInclude Include="src\Common\Rect.h" />
+    <ClInclude Include="src\Common\Point.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Data Structures\Buffer.cpp" />
