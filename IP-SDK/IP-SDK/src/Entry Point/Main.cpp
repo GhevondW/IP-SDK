@@ -1,3 +1,4 @@
+#if 0
 #include "GlobalDefines.h"
 #include "Image.h"
 #include <opencv2/opencv.hpp>
@@ -219,17 +220,21 @@ int main() {
 
 	const std::vector<std::string>& all_paths = paths.GetFilesPath();
 
-	for (int i = 0; i < all_paths.size(); i++)
+	for (int i = 0; i < all_paths.size() - 5; i++)
 	{
 		cv::Mat image = cv::imread(all_paths[i], cv::IMREAD_GRAYSCALE);
 		cv::Mat canny;
-
+		cv::equalizeHist(image, image);
+#if 1
 		auto result = thresh_callback(image, canny);
 
 		sdk::Rect cent_rect = GetBoundingRect(result);
 
 		DrawRect(image, cent_rect);
-		cv::imwrite("obj_res\\file_"+std::to_string(i) + ".png", image);
+#endif
+		//cv::imwrite("obj_res\\file_"+std::to_string(i) + ".png", image);
+		cv::namedWindow("image" + std::to_string(i), cv::WINDOW_NORMAL);
+		cv::imshow("image" + std::to_string(i), canny);
 	}
 #if 0
 	cv::Mat image = cv::imread(all_paths[0], cv::IMREAD_GRAYSCALE);
@@ -245,6 +250,7 @@ int main() {
 	cv::imshow("image", image);
 	cv::waitKey(0);
 #endif
+	cv::waitKey(0);
 	std::cout << "Hello world" << std::endl;
 	return 0;
 }
@@ -320,18 +326,18 @@ std::vector<std::vector<cv::Point>> thresh_callback(cv::Mat& gray, cv::Mat& cann
 	vector<vector<cv::Point>> contours;
 	vector<Vec4i> hierarchy;
 
-	cv::GaussianBlur(gray, gray, cv::Size(3, 3), 2, 2);
+	cv::GaussianBlur(gray, gray, cv::Size(25, 25), 2, 2);
 
 	/// Detect edges using canny
-	Canny(gray, canny, 20, 60, 3, false);
+	Canny(gray, canny, 150, 200, 3, false);
 	//cv::threshold(gray, canny, 0, 255, cv::THRESH_BINARY_INV + cv::THRESH_OTSU);
 	//adaptiveThreshold(gray, canny, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 51, 12);
 	/// Find contours
-	findContours(canny, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+	//findContours(canny, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
 	/// Draw contours
 
-#if 1
+#if 0
 	RNG rng(12345);
 	Mat drawing = Mat::zeros(canny.size(), CV_8UC3);
 	for (int i = 0; i < contours.size(); i++)
@@ -339,10 +345,11 @@ std::vector<std::vector<cv::Point>> thresh_callback(cv::Mat& gray, cv::Mat& cann
 		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 		drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, cv::Point());
 	}
-#endif
+
 	/// Show in a window
 	namedWindow("Contours", WINDOW_NORMAL);
 	imshow("Contours", drawing);
-
+#endif
 	return contours;
 }
+#endif

@@ -29,6 +29,7 @@
   <ItemGroup>
     <ClCompile Include="src\Data Structures\Buffer.cpp" />
     <ClCompile Include="src\Data Structures\Image.cpp" />
+    <ClCompile Include="src\Entry Point\EntryPoint.cpp" />
     <ClCompile Include="src\Entry Point\Main.cpp" />
   </ItemGroup>
   <ItemGroup>

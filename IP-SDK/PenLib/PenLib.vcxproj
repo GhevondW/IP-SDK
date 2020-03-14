@@ -20,12 +20,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CSVReader.h" />
+    <ClInclude Include="include\DirManager.h" />
     <ClInclude Include="include\GDefines.h" />
     <ClInclude Include="include\Row.h" />
+    <ClInclude Include="include\Table.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CSVReader.cpp" />
+    <ClCompile Include="src\DirManager.cpp" />
     <ClCompile Include="src\Row.cpp" />
+    <ClCompile Include="src\Table.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
