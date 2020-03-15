@@ -3,7 +3,13 @@
 
 namespace pen
 {
-	class Table {};
+	class Table 
+	{
+	public:
+
+	private:
+
+	};
 };
 
 #endif // !_TABLE_H__

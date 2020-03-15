@@ -4,7 +4,7 @@ using namespace pen;
 
 DirManager CSVReader::G_DirManager = {};
 
-Table CSVReader::ReadCSV(const std::string& filePath)
+std::shared_ptr<Table> CSVReader::ReadCSV(const std::string& filePath)
 {
 	return {};
 }

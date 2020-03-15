@@ -1,3 +1,5 @@
+#if 0
+
 #include <DirManager.h>
 #include <opencv2/opencv.hpp>
 #include "Rect.h"
@@ -153,3 +155,5 @@ int main()
 
 	return 0;
 }
+
+#endif
