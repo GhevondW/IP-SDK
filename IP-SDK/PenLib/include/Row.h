@@ -3,6 +3,7 @@
 #include <initializer_list>
 #include <any>
 #include "GDefines.h"
+#include <iostream>
 
 #ifndef _ROW_H_
 #define _ROW_H_
@@ -18,7 +19,7 @@ namespace pen
 			:_Values()
 		{}
 
-		Row(std::initializer_list<Entity> list)
+		Row(const std::initializer_list<Entity>& list)
 		{
 			_Values.insert(_Values.end(), list.begin(), list.end());
 		}
