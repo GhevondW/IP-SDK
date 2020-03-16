@@ -28,7 +28,6 @@
   <ItemGroup>
     <ClCompile Include="src\CSVReader.cpp" />
     <ClCompile Include="src\DirManager.cpp" />
-    <ClCompile Include="src\Row.cpp" />
     <ClCompile Include="src\Table.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
