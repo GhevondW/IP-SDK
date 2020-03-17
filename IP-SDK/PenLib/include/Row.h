@@ -19,7 +19,7 @@ namespace pen
 			:_Values()
 		{}
 
-		Row(const std::initializer_list<Entity>& list)
+		Row(std::initializer_list<T>&& list)
 		{
 			_Values.insert(_Values.end(), list.begin(), list.end());
 		}
@@ -35,11 +35,13 @@ namespace pen
 		Row& operator=(const Row& other)
 		{
 			_Values = other._Values;
+			return *this;
 		}
 
 		Row& operator=(Row&& other)
 		{
 			_Values = std::move(other._Values);
+			return *this;
 		}
 
 	public:
@@ -91,6 +93,11 @@ namespace pen
 				_Values[x] = std::move(value);
 			}
 			throw "Invalid Operation";
+		}
+
+		void PushBack(const Entity& value)
+		{
+			_Values.push_back(value);
 		}
 
 	private:

@@ -2,6 +2,7 @@
 #define _CSV_READER_H_
 
 #include <memory>
+#include <fstream>
 #include "Table.h"
 #include "DirManager.h"
 
@@ -10,7 +11,12 @@ namespace pen
 	class CSVReader
 	{
 	public:
-		static std::shared_ptr<Table> ReadCSV(const std::string& filePath);
+		static Table* ReadCSV(const std::string& filePath);
+
+	private:
+
+		std::vector<std::string> GetData(const std::string& fileName);
+
 	private:
 		static DirManager G_DirManager;
 	};
