@@ -10,6 +10,7 @@ namespace pen
 	typedef Row<std::string> ColumnRow;
 	typedef std::vector<AnyValRow*> TableDS; // DS AS Data Structure
 	typedef std::vector<AnyValRow>&& MoveTableDS;
+	typedef const std::vector<std::vector<std::string>>& CopyTableDS;
 
 	class Table 
 	{
@@ -19,6 +20,10 @@ namespace pen
 		Table(std::initializer_list<std::string>&& cols);
 		Table(const ColumnRow& cols);
 		Table(MoveTableDS data);
+		Table(CopyTableDS data)
+		{
+			bool b = false;
+		}
 
 		Table(const Table& other); //This construction will wrap the Table
 		Table(Table&& other);

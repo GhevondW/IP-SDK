@@ -1,3 +1,4 @@
+#if 0
 #include <DirManager.h>
 #include <Row.h>
 #include <Table.h>
@@ -5,14 +6,15 @@
 
 int main()
 {
-	/*
-	pen::Table* table = new pen::Table
-	({
-		{"11","12","13"},
-		{"21","22","23"},
-		{"31","32","33"}
-	});
-	*/
+	
+	auto data = pen::CSVReader::GetData("C:\\Users\\Ghevond\\Desktop\\AstroDataManipulations\\DataExtraction\\fbs1309_dataset.csv");
 
+	pen::Table* table = new pen::Table{ data };
+	
+
+	
+
+	delete table;
 	return 0;
 }
+#endif

@@ -13,9 +13,9 @@ namespace pen
 	public:
 		static Table* ReadCSV(const std::string& filePath);
 
-	private:
+	public:
 
-		std::vector<std::string> GetData(const std::string& fileName);
+		static std::vector<std::vector<std::string>> GetData(const std::string& fileName);
 
 	private:
 		static DirManager G_DirManager;
