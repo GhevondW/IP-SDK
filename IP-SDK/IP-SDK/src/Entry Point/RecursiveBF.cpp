@@ -471,6 +471,191 @@ inline void __Recursive_BF_X(cv::Vec3b* img, cv::Vec3b* out,
 	}
 }
 
+
+inline void __Recursive_BF_Y(cv::Vec3b* img, cv::Vec3b* out,
+							float sigma_spatial, float sigma_range,
+							int width, int height, int channel,
+							float* buffer, const float* const range_table)
+{
+	const int width_height = width * height;
+	const int width_channel = width * channel;
+	const int width_height_channel = width * height * channel;
+
+	float* img_out_f = buffer;
+	float* img_temp = &img_out_f[width_height_channel];
+	float* map_factor_a = &img_temp[width_height_channel];
+	float* map_factor_b = &map_factor_a[width_height];
+	float* slice_factor_a = &map_factor_b[width_height];
+	float* slice_factor_b = &slice_factor_a[width_channel];
+	float* line_factor_a = &slice_factor_b[width_channel];
+	float* line_factor_b = &line_factor_a[width];
+
+	float alpha = static_cast<float>(exp(-sqrt(2.0) / (sigma_spatial * height)));
+	float inv_alpha_ = 1 - alpha;
+	float* ycy, * ypy, * xcy;
+	cv::Vec3b* tcy, * tpy;
+
+	float* in_factor = map_factor_a;
+	float* ycf, * ypf, * xcf;
+
+	int h1 = height - 1;
+	for (int y = 1; y < height; y++)
+	{
+		tpy = &img[(y - 1) * width];
+		tcy = &img[y * width];
+		xcy = &img_temp[y * width_channel];
+		ypy = &img_out_f[(y - 1) * width_channel];
+		ycy = &img_out_f[y * width_channel];
+
+		xcf = &in_factor[y * width];
+		ypf = &map_factor_b[(y - 1) * width];
+		ycf = &map_factor_b[y * width];
+		for (int x = 0; x < width; x++)
+		{
+			cv::Vec3b tcy_pp = *tcy;
+			cv::Vec3b tpy_pp = *tpy;
+			unsigned char dr = abs((tcy_pp[0]) - (tpy_pp[0]));
+			unsigned char dg = abs((tcy_pp[1]) - (tpy_pp[1]));
+			unsigned char db = abs((tcy_pp[2]) - (tpy_pp[2]));
+			++tcy;
+			++tpy;
+			int range_dist = (((dr << 1) + dg + db) >> 2);
+			float weight = range_table[range_dist];
+			float alpha_ = weight * alpha;
+			for (int c = 0; c < channel; c++)
+				*ycy++ = inv_alpha_ * (*xcy++) + alpha_ * (*ypy++);
+			*ycf++ = inv_alpha_ * (*xcf++) + alpha_ * (*ypf++);
+
+			if (y == h1) {
+				ypf = line_factor_b;
+				ypf[x] = in_factor[h1 * width + x];
+				map_factor_b[h1 * width + x] = 0.5f * (map_factor_b[h1 * width + x] + ypf[x]);
+
+				ycy = slice_factor_a;
+				ypy = slice_factor_b;
+
+				int tmp_dp = x * channel;
+				ypy[tmp_dp] = img_temp[h1 * width_channel + tmp_dp];
+				ypy[tmp_dp + 1] = img_temp[h1 * width_channel + tmp_dp + 1];
+				ypy[tmp_dp + 2] = img_temp[h1 * width_channel + tmp_dp + 2];
+
+				int k = 0;
+				for (int x = 0; x < width; x++) {
+					for (int c = 0; c < channel; c++) {
+						int idx = (h1 * width + x) * channel + c;
+						img_out_f[idx] = 0.5f * (img_out_f[idx] + ypy[k++]) / map_factor_b[h1 * width + x];
+					}
+				}
+			}
+
+		}
+	}
+
+}
+
+inline void __Recursive_BF_Z(cv::Vec3b* img, cv::Vec3b* out,
+							float sigma_spatial, float sigma_range,
+							int width, int height, int channel,
+							float* buffer, const float* const range_table)
+{
+	const int width_height = width * height;
+	const int width_channel = width * channel;
+	const int width_height_channel = width * height * channel;
+
+	float* img_out_f = buffer;
+	float* img_temp = &img_out_f[width_height_channel];
+	float* map_factor_a = &img_temp[width_height_channel];
+	float* map_factor_b = &map_factor_a[width_height];
+	float* slice_factor_a = &map_factor_b[width_height];
+	float* slice_factor_b = &slice_factor_a[width_channel];
+	float* line_factor_a = &slice_factor_b[width_channel];
+	float* line_factor_b = &line_factor_a[width];
+
+	const int h1 = height - 1;
+
+	float* ycf, * ypf, * xcf;
+	float* ycy, * ypy, * xcy;
+
+	ycf = line_factor_a;
+	ypf = line_factor_b;
+
+	ycy = slice_factor_a;
+	ypy = slice_factor_b;
+
+	float alpha = static_cast<float>(exp(-sqrt(2.0) / (sigma_spatial * height)));
+	float inv_alpha_ = 1 - alpha;
+	
+	cv::Vec3b* tcy, * tpy;
+
+	float* in_factor = map_factor_a;
+
+	floatData3* pTmp = (floatData3*)img_out_f;
+	for (int y = h1 - 1; y >= 0; y--)
+	{
+		tpy = &img[(y + 1) * width];
+		tcy = &img[y * width];
+		xcy = &img_temp[y * width_channel];
+		float* ycy_ = ycy;
+		float* ypy_ = ypy;
+		float* out_ = &img_out_f[y * width_channel];
+
+		xcf = &in_factor[y * width];
+		float* ycf_ = ycf;
+		float* ypf_ = ypf;
+		float* factor_ = &map_factor_b[y * width];
+		for (int x = 0; x < width; x++)
+		{
+			cv::Vec3b tcy_pp = *tcy;
+			cv::Vec3b tpy_pp = *tpy;
+			unsigned char dr = abs((tcy_pp[0]) - (tpy_pp[0]));
+			unsigned char dg = abs((tcy_pp[1]) - (tpy_pp[1]));
+			unsigned char db = abs((tcy_pp[2]) - (tpy_pp[2]));
+			++tcy;
+			++tpy;
+			int range_dist = (((dr << 1) + dg + db) >> 2);
+			float weight = range_table[range_dist];
+			float alpha_ = weight * alpha;
+
+			float fcc = inv_alpha_ * (*xcf++) + alpha_ * (*ypf_++);
+			*ycf_++ = fcc;
+			*factor_ = 0.5f * (*factor_ + fcc);
+
+			for (int c = 0; c < channel; c++)
+			{
+				float ycc = inv_alpha_ * (*xcy++) + alpha_ * (*ypy_++);
+				*ycy_++ = ycc;
+				*out_ = 0.5f * (*out_ + ycc) / (*factor_);
+				*out_++;
+			}
+			*factor_++;
+
+			int dp = y * width + x;
+			out[dp][0] = static_cast<unsigned char>(pTmp[dp].a);
+			out[dp][1] = static_cast<unsigned char>(pTmp[dp].b);
+			out[dp][2] = static_cast<unsigned char>(pTmp[dp].c);
+
+
+			int dp_ypy = x * channel;
+			ypy[dp_ypy] = ycy[dp_ypy];
+			ypy[dp_ypy + 1] = ycy[dp_ypy + 1];
+			ypy[dp_ypy + 2] = ycy[dp_ypy + 2];
+
+			ypf[x] = ycf[x];
+		}
+	}
+
+}
+
+inline void __Recursive_BF_Main(cv::Vec3b* img, cv::Vec3b* out,
+	float sigma_spatial, float sigma_range,
+	int width, int height, int channel,
+	float* buffer, const float* const range_table)
+{
+	__Recursive_BF_X(img, out, sigma_spatial, sigma_range, width, height, channel, buffer, range_table);
+	__Recursive_BF_Y(img, out, sigma_spatial, sigma_range, width, height, channel, buffer, range_table);
+	__Recursive_BF_Z(img, out, sigma_spatial, sigma_range, width, height, channel, buffer, range_table);
+}
+
 // -----------------------------------------------------------------------------------------------------------------------------------------
 
 int main() {
@@ -481,7 +666,7 @@ int main() {
 	cv::Mat out = src.clone();
 
 
-	const float sigma_range = 0.1;
+	const float sigma_range = 0.2;
 	const float sigma_spatial = 0.02;
 
 	const int width = src.cols;
@@ -500,7 +685,7 @@ int main() {
 	for (int i = 0; i <= QX_DEF_CHAR_MAX; i++)
 		range_table[i] = static_cast<float>(exp(-i * inv_sigma_range));
 
-	__Recursive_bf_rgb((cv::Vec3b*)src.data, (cv::Vec3b*)out.data, sigma_spatial, sigma_range, width, height, channel, buffer, range_table);
+	__Recursive_BF_Main((cv::Vec3b*)src.data, (cv::Vec3b*)out.data, sigma_spatial, sigma_range, width, height, channel, buffer, range_table);
 
 	delete[] buffer;
 
