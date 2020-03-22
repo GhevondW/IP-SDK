@@ -356,7 +356,7 @@ inline void __Recursive_bf_rgb(cv::Vec3b* img, cv::Vec3b* out,
 inline void __Recursive_BF_X(cv::Vec3b* img, cv::Vec3b* out,
 							float sigma_spatial, float sigma_range,
 							int width, int height, int channel,
-							float* buffer, const float* const range_table, int iRowIndex)
+							float* buffer, const float* const range_table)
 {
 	const int width_height = width * height;
 	const int width_channel = width * channel;
@@ -376,9 +376,8 @@ inline void __Recursive_BF_X(cv::Vec3b* img, cv::Vec3b* out,
 	float fp, fc;
 	float inv_alpha_ = 1 - alpha;
 
-	//for (int y = 0; y < height; y++)
-	//{
-	int y = iRowIndex;
+	for (int y = 0; y < height; y++)
+	{
 		float* temp_x = &img_temp[y * width_channel];
 		cv::Vec3b* in_x = &img[y * width];
 		cv::Vec3b* texture_x = &img[y * width];
@@ -487,7 +486,7 @@ inline void __Recursive_BF_X(cv::Vec3b* img, cv::Vec3b* out,
 			}
 		}
 
-	//}
+	}
 }
 
 
@@ -547,7 +546,7 @@ inline void __Recursive_BF_Y(cv::Vec3b* img, cv::Vec3b* out,
 				*ycy++ = inv_alpha_ * (*xcy++) + alpha_ * (*ypy++);
 			*ycf++ = inv_alpha_ * (*xcf++) + alpha_ * (*ypf++);
 
-			if (y == h1 && false) {
+			if (y == h1) {
 				ypf = line_factor_b;
 				ypf[x] = in_factor[h1 * width + x];
 				map_factor_b[h1 * width + x] = 0.5f * (map_factor_b[h1 * width + x] + ypf[x]);
@@ -612,9 +611,9 @@ inline void __Recursive_BF_Z(cv::Vec3b* img, cv::Vec3b* out,
 	float* in_factor = map_factor_a;
 
 	floatData3* pTmp = (floatData3*)img_out_f;
-	for (/*int y = h1 - 1; y >= 0; y--*/int yt = 0; yt < height - 1; yt++)
+	for (/*int y = h1 - 1; y >= 0; y--*/int yt = 0; yt < h1 - 1; yt++)
 	{
-		int y = (height - 1) - yt;
+		int y = (h1 - 1) - yt;
 		tpy = &img[(y + 1) * width];
 		tcy = &img[y * width];
 		xcy = &img_temp[y * width_channel];
@@ -628,13 +627,15 @@ inline void __Recursive_BF_Z(cv::Vec3b* img, cv::Vec3b* out,
 		float* factor_ = &map_factor_b[y * width];
 		for (int x = 0; x < width; x++)
 		{
-			cv::Vec3b tcy_pp = *tcy;
-			cv::Vec3b tpy_pp = *tpy;
+			cv::Vec3b tcy_pp = tcy[x];
+			cv::Vec3b tpy_pp = tpy[x];
 			unsigned char dr = abs((tcy_pp[0]) - (tpy_pp[0]));
 			unsigned char dg = abs((tcy_pp[1]) - (tpy_pp[1]));
 			unsigned char db = abs((tcy_pp[2]) - (tpy_pp[2]));
+			/*
 			++tcy;
 			++tpy;
+			*/
 			int range_dist = (((dr << 1) + dg + db) >> 2);
 			float weight = range_table[range_dist];
 			float alpha_ = weight * alpha;
@@ -657,13 +658,14 @@ inline void __Recursive_BF_Z(cv::Vec3b* img, cv::Vec3b* out,
 			out[dp][1] = static_cast<unsigned char>(pTmp[dp].b);
 			out[dp][2] = static_cast<unsigned char>(pTmp[dp].c);
 
-
+			
 			int dp_ypy = x * channel;
 			ypy[dp_ypy] = ycy[dp_ypy];
 			ypy[dp_ypy + 1] = ycy[dp_ypy + 1];
 			ypy[dp_ypy + 2] = ycy[dp_ypy + 2];
 
 			ypf[x] = ycf[x];
+			
 		}
 	}
 
@@ -905,9 +907,9 @@ inline void __Recursive_BF_Y_V(cv::Vec3b* img, cv::Vec3b* out,
 inline void __Recursive_BF_Z_V(cv::Vec3b* img, cv::Vec3b* out,
 	float sigma_spatial, float sigma_range,
 	int width, int height, int channel,
-	float* buffer, const float* const range_table, int iRowIndex)
+	float* buffer, const float* const range_table, int iColIndex)
 {
-	if (iRowIndex < 0 || iRowIndex >= height - 1) return;
+	//if (iRowIndex < 0 || iRowIndex >= height - 2) return;
 	const int width_height = width * height;
 	const int width_channel = width * channel;
 	const int width_height_channel = width * height * channel;
@@ -940,63 +942,69 @@ inline void __Recursive_BF_Z_V(cv::Vec3b* img, cv::Vec3b* out,
 	float* in_factor = map_factor_a;
 
 	floatData3* pTmp = (floatData3*)img_out_f;
-	int y = iRowIndex;
-	//for (int y = h1 - 1; y >= 0; y--)
+	//int yt = iRowIndex;
+	int x = iColIndex;
+	//for (int x = 0; x < width; x++)
 	//{
-		tpy = &img[(y + 1) * width];
-		tcy = &img[y * width];
-		xcy = &img_temp[y * width_channel];
-		float* ycy_ = ycy;
-		float* ypy_ = ypy;
-		float* out_ = &img_out_f[y * width_channel];
-
-		xcf = &in_factor[y * width];
-		float* ycf_ = ycf;
-		float* ypf_ = ypf;
-		float* factor_ = &map_factor_b[y * width];
-		for (int x = 0; x < width; x++)
+		for (int yt = 0; yt < h1 - 1; yt++)
 		{
+			int y = (h1 - 1) - yt;
+
+			int dp_bottom = (y + 1) * width + x;
+			int dp_curr = (y) * width + x;
+			tpy = &img[dp_bottom];
+			tcy = &img[dp_curr];
+			xcy = &img_temp[y * width_channel + x * channel];
+			floatData3* ycy_ = (floatData3*)ycy; //slice_factor_a
+			ycy_ += x;
+			floatData3* ypy_ = (floatData3*)ypy; //slice_factor_b
+			ypy_ += x;
+
+			floatData3* out_ = (floatData3*)img_out_f;// [y * width_channel + x * channel] ;
+			out_ += dp_curr;
+
+			xcf = &in_factor[dp_curr];
+			float* ycf_ = &ycf[x]; //line_factor_a
+			float* ypf_ = &ypf[x]; //line_factor_b
+			float* factor_ = &map_factor_b[dp_curr];
+
 			cv::Vec3b tcy_pp = *tcy;
 			cv::Vec3b tpy_pp = *tpy;
 			unsigned char dr = abs((tcy_pp[0]) - (tpy_pp[0]));
 			unsigned char dg = abs((tcy_pp[1]) - (tpy_pp[1]));
 			unsigned char db = abs((tcy_pp[2]) - (tpy_pp[2]));
-			++tcy;
-			++tpy;
+
 			int range_dist = (((dr << 1) + dg + db) >> 2);
 			float weight = range_table[range_dist];
 			float alpha_ = weight * alpha;
 
-			float fcc = inv_alpha_ * (*xcf++) + alpha_ * (*ypf_++);
-			*ycf_++ = fcc;
+			float fcc = inv_alpha_ * (*xcf) + alpha_ * (*ypf_);
+			*ycf_ = fcc;
 			*factor_ = 0.5f * (*factor_ + fcc);
 
 			for (int c = 0; c < channel; c++)
 			{
-				float ycc = inv_alpha_ * (*xcy++) + alpha_ * (*ypy_++);
-				*ycy_++ = ycc;
-				*out_ = 0.5f * (*out_ + ycc) / (*factor_);
-				*out_++;
+				float ycc = inv_alpha_ * (xcy[c]) + alpha_ * ((*ypy_)[c]);
+				(*ycy_)[c] = ycc;
+				(*out_)[c] = 0.5f * ((*out_)[c] + ycc) / (*factor_);
 			}
-			*factor_++;
 
 			int dp = y * width + x;
 			out[dp][0] = static_cast<unsigned char>(pTmp[dp].a);
 			out[dp][1] = static_cast<unsigned char>(pTmp[dp].b);
 			out[dp][2] = static_cast<unsigned char>(pTmp[dp].c);
 
-
+			
 			int dp_ypy = x * channel;
 			ypy[dp_ypy] = ycy[dp_ypy];
 			ypy[dp_ypy + 1] = ycy[dp_ypy + 1];
 			ypy[dp_ypy + 2] = ycy[dp_ypy + 2];
 
 			ypf[x] = ycf[x];
+			
 		}
 	//}
-
 }
-
 //---------------------------------------------------------------------------------------------------------------------
 
 typedef std::function<void(cv::Vec3b * img, cv::Vec3b * out,
@@ -1010,7 +1018,6 @@ inline void __Recursive_BF_Main(cv::Vec3b* img, cv::Vec3b* out,
 	float* buffer, const float* const range_table)
 {
 	
-#if 1
 	auto f1 = __Recursive_BF_X_H;
 	auto f2 = __Recursive_BF_Y_V;
 	auto f3 = __Recursive_BF_Z_V;
@@ -1033,7 +1040,7 @@ inline void __Recursive_BF_Main(cv::Vec3b* img, cv::Vec3b* out,
 	};
 
 	auto f_inv = [&](int begin, int end, kFunc func) {
-		for (int i = end - 1; i >= begin; i--)
+		for (int i = end; i >= begin; i--)
 		{
 			func(img, out, sigma_spatial, sigma_range, width, height, channel, buffer, range_table, i);
 		}
@@ -1050,24 +1057,13 @@ inline void __Recursive_BF_Main(cv::Vec3b* img, cv::Vec3b* out,
 
 	t1.join();
 	t2.join();
-#if 0
-	t1 = std::thread{ f, b_1, e_1, f3 };
-	t2 = std::thread{ f, b_2, e_2, f3 };
 
-	t2.join();
+	t1 = std::thread{ f, b1, e1, f3 };
+	t2 = std::thread{ f, b2, e2, f3 };
+
 	t1.join();
-#else
-	__Recursive_BF_Z(img, out, sigma_spatial, sigma_range, width, height, channel, buffer, range_table);
-#endif
-	/*
-	t1 = std::thread{ f_inv, b1, e1, f3 };
-	t1.join();
-
-	t2 = std::thread{ f_inv, b2, e2, f3 };
 	t2.join();
-	*/
 
-#endif
 	//__Recursive_BF_X(img, out, sigma_spatial, sigma_range, width, height, channel, buffer, range_table);
 	//__Recursive_BF_Y_V(img, out, sigma_spatial, sigma_range, width, height, channel, buffer, range_table);
 	//__Recursive_BF_Z(img, out, sigma_spatial, sigma_range, width, height, channel, buffer, range_table);
