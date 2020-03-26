@@ -1,3 +1,5 @@
+#if 0
+
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <math.h>
@@ -1110,3 +1112,4 @@ int main() {
 
 	return 0;
 }
+#endif
