@@ -17,5 +17,6 @@
     <ClCompile Include="src\Entry Point\RecursiveBF.cpp" />
     <ClCompile Include="src\Entry Point\TestClutering.cpp" />
     <ClCompile Include="src\Entry Point\EdgeDetectionMain.cpp" />
+    <ClCompile Include="src\Entry Point\SDataExtraction.cpp" />
   </ItemGroup>
 </Project>

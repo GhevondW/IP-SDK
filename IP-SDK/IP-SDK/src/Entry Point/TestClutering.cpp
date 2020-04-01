@@ -1,9 +1,11 @@
+#if 0
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <math.h>
 #include <string.h>
 #include <thread>
-
+#include <DirManager.h>
+#if 0
 void CalcHist(cv::Mat& src, int* const hist)
 {
 	int width = src.cols;
@@ -117,3 +119,108 @@ int main()
 
 	return 0;
 }
+#endif
+
+#if 1
+int main()
+{
+	pen::DirManager dir("obj_test_res", "tiff");
+	auto& images = dir.GetFilesWithExt();
+#if 0
+	cv::Mat src = cv::imread(images[2], -1/*cv::IMREAD_GRAYSCALE*/);
+	cv::Mat canny;
+
+	
+
+	//cv::equalizeHist(src, src);
+	//cv::GaussianBlur(src, src, cv::Size(5, 5), 12, 12);
+	//cv::threshold(src, canny, 0, 255, cv::THRESH_BINARY_INV + cv::THRESH_OTSU);
+	//findContours(canny, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+
+	cv::GaussianBlur(src, src, cv::Size(3, 3), 0, 0, cv::BORDER_DEFAULT);
+	cv::Laplacian(src, src, CV_16U, 3, 1, 0, cv::BORDER_DEFAULT);
+
+	cv::namedWindow("image_in", cv::WINDOW_NORMAL);
+	cv::imshow("image_in", src);
+	cv::waitKey(0);
+#else
+
+	cv::Mat src;
+
+	for (int i = 0; i < images.size(); i++)
+	{
+		src = cv::imread(images[i], -1/*cv::IMREAD_GRAYSCALE*/);
+		cv::GaussianBlur(src, src, cv::Size(3, 3), 2, 2, cv::BORDER_DEFAULT);
+		cv::Laplacian(src, src, CV_16U, 3, 1, 0, cv::BORDER_DEFAULT);
+		std::string path = "cd\\" + images[i];
+		cv::imwrite(path, src);
+	}
+
+	cv::namedWindow("image_in", cv::WINDOW_NORMAL);
+	cv::imshow("image_in", src);
+	cv::waitKey(0);
+
+#endif
+	return 0;
+}
+#else
+
+double medianMat(cv::Mat Input, int nVals) {
+	// COMPUTE HISTOGRAM OF SINGLE CHANNEL MATRIX
+	float range[] = { 0, nVals };
+	const float* histRange = { range };
+	bool uniform = true; bool accumulate = false;
+	cv::Mat hist;
+	calcHist(&Input, 1, 0, cv::Mat(), hist, 1, &nVals, &histRange, uniform, accumulate);
+
+	// COMPUTE CUMULATIVE DISTRIBUTION FUNCTION (CDF)
+	cv::Mat cdf;
+	hist.copyTo(cdf);
+	for (int i = 1; i <= nVals - 1; i++) {
+		cdf.at<float>(i) += cdf.at<float>(i - 1);
+	}
+	cdf /= Input.total();
+
+	// COMPUTE MEDIAN
+	double medianVal;
+	for (int i = 0; i <= nVals - 1; i++) {
+		if (cdf.at<float>(i) >= 0.5) { medianVal = i;  break; }
+	}
+	return medianVal;
+}
+
+int main()
+{
+	pen::DirManager dir("obj_test_res", "tiff");
+	auto& images = dir.GetFilesWithExt();
+#if 1
+	cv::Mat src = cv::imread(images[13589], -1);
+	cv::Mat canny;
+
+
+	cv::GaussianBlur(src, src, cv::Size(5, 5), 2, 2, cv::BORDER_DEFAULT);
+	cv::Laplacian(src, src, CV_16U, 3, 1, 0, cv::BORDER_DEFAULT);
+
+	cv::namedWindow("image_in", cv::WINDOW_NORMAL);
+	cv::imshow("image_in", src);
+	cv::waitKey(0);
+#endif
+
+	//cv::Mat src, canny;
+
+	//for (int i = 0; i < images.size(); i++)
+	//{
+	//	src = cv::imread(images[i],cv::IMREAD_GRAYSCALE);
+	//	std::string path = "cd\\" + images[i];
+	//	cv::threshold(src, canny, 0, 255, cv::THRESH_BINARY_INV + cv::THRESH_OTSU);
+	//	cv::imwrite(path, canny);
+	//}
+
+	//cv::namedWindow("image_in", cv::WINDOW_NORMAL);
+	//cv::imshow("image_in", src);
+	//cv::waitKey(0);
+
+	return 0;
+}
+#endif
+#endif

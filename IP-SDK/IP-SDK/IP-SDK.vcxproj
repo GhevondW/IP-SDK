@@ -34,6 +34,7 @@
     <ClCompile Include="src\Entry Point\EntryPointPenLibTest.cpp" />
     <ClCompile Include="src\Entry Point\Main.cpp" />
     <ClCompile Include="src\Entry Point\RecursiveBF.cpp" />
+    <ClCompile Include="src\Entry Point\SDataExtraction.cpp" />
     <ClCompile Include="src\Entry Point\TestClutering.cpp" />
   </ItemGroup>
   <ItemGroup>

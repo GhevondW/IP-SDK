@@ -7,9 +7,9 @@
 int main()
 {
 	
-	auto data = pen::CSVReader::GetData("C:\\Users\\Ghevond\\Desktop\\AstroDataManipulations\\DataExtraction\\fbs1309_dataset.csv");
+	auto table = pen::CSVReader::ReadCSV("C:\\Users\\Ghevond\\Desktop\\AstroDataManipulations\\DataExtraction\\fbs1309_dataset.csv");
 
-	pen::Table* table = new pen::Table{ data };
+	
 	
 
 	

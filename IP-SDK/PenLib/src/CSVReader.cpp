@@ -7,7 +7,9 @@ DirManager CSVReader::G_DirManager = {};
 
 Table* CSVReader::ReadCSV(const std::string& filePath)
 {
-	return {};
+	std::vector<std::vector<std::string>> data = GetData(filePath);
+
+	return new Table{data};
 }
 
 std::vector<std::vector<std::string>> CSVReader::GetData(const std::string& fileName)

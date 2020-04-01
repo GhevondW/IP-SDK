@@ -51,7 +51,7 @@ Table::Table(MoveTableDS data)
 		if (check_data) {
 			for (int i = 0; i < begin_size; i++)
 			{
-				_Cols.PushBack("col_" + std::to_string(i));
+				_Cols.PushBack(DEF_COL_NAME + std::to_string(i));
 			}
 			int size = data.size();
 			for (int i = 0; i < size; i++)
@@ -66,6 +66,14 @@ Table::Table(MoveTableDS data)
 	}
 	else {
 		InitDefault();
+	}
+}
+
+Table::Table(CopyTableDS data)
+{
+	InitDefault();
+	if (CheckInputData(data)) {
+		InitTable(data);
 	}
 }
 
@@ -149,3 +157,61 @@ void Table::InitDefault()
 	_Data = {};
 	_Cols = {};
 }
+
+bool Table::CheckInputData(CopyTableDS data)
+{
+	if (data.empty()) return false;
+	auto begin = data.begin();
+	int size = begin->size();
+
+	if (!((*begin).at(0).empty())) return false;
+
+	while (begin != data.end())
+	{
+		if (begin->size() != size) {
+			return false;
+		}
+		++begin;
+	}
+	return true;
+}
+
+void Table::InitTable(CopyTableDS data)
+{
+	_Cols = *data.begin();
+	_Cols[0] = DEF_INDEX_NAME;
+	auto start = data.begin() + 1;
+	while (start != data.end())
+	{
+		_Data.push_back(new AnyValRow(*start, &_Cols));
+		++start;
+	}
+}
+
+
+AnyValRow* Table::GetRow(const int index)
+{
+	int count = GetDataCount();
+	if (index >= 0 && index < count) {
+		return _Data[index];
+	}
+	return nullptr;
+}
+
+AnyValRow* Table::GetFirstRowIf(CheckFunction fCheck)
+{
+	auto begin = _Data.begin();
+	while (begin != _Data.end())
+	{
+		if (fCheck(**begin)) {
+			return *begin;
+		}
+		++begin;
+	}
+	return nullptr;
+}
+
+
+
+const std::string Table::DEF_INDEX_NAME = "index";
+const std::string Table::DEF_COL_NAME = "col_";

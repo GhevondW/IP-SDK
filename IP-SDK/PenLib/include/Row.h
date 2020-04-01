@@ -14,21 +14,34 @@ namespace pen
 	class Row
 	{
 		typedef T Entity;
+		friend class Table;
 	public:
 		Row()
-			:_Values()
+			:_Values(),
+			_pColRef(nullptr)
 		{}
 
-		Row(std::initializer_list<T>&& list)
+		Row(std::initializer_list<T>&& list, const Row<std::string>* colRef = nullptr)
+			:_pColRef(colRef)
 		{
 			_Values.insert(_Values.end(), list.begin(), list.end());
 		}
 
-		Row(const std::vector<Entity>& other) : _Values(other){}
-		Row(const Row& other) :_Values(other._Values){}
-		Row(Row&& other) : _Values(std::move(other._Values)) {}
+		Row(const std::vector<Entity>& other, const Row<std::string>* colRef = nullptr) : _Values(other), _pColRef(colRef){}
+		Row(const Row& other) :_Values(other._Values)
+		{
+			_pColRef = other._pColRef;
+		}
+		Row(Row&& other) : _Values(std::move(other._Values)) 
+		{
+			_pColRef = other._pColRef;
+			other._pColRef = nullptr;
+		}
 
-		~Row() {}
+		~Row() 
+		{
+			_pColRef = nullptr;
+		}
 
 	public:
 
@@ -57,10 +70,25 @@ namespace pen
 
 		Entity& operator[](const int x)
 		{
-			if (x >= 0 && x < GetLength) {
+			if (x >= 0 && x < GetLength()) {
 				return _Values[x];
 			}
 			throw "Invalid Operation";
+		}
+
+		Entity& LocCol(const std::string& colName) 
+		{
+			if (_pColRef != nullptr) {
+				auto it = std::find(_pColRef->_Values.begin(), _pColRef->_Values.end(), colName);
+				if (it != _pColRef->_Values.end()) {
+					int index = std::distance(_pColRef->_Values.begin(), it);
+					int size = GetLength();
+					if (index >= 0 && index < size) {
+						return _Values[index];
+					}
+				}
+			}
+			throw "invalid operation";
 		}
 
 #if _DEBUG_
@@ -95,6 +123,9 @@ namespace pen
 			throw "Invalid Operation";
 		}
 
+		
+	private:
+
 		void PushBack(const Entity& value)
 		{
 			_Values.push_back(value);
@@ -102,6 +133,7 @@ namespace pen
 
 	private:
 		std::vector<Entity> _Values{};
+		const Row<std::string>* _pColRef{nullptr};
 	};
 }
 
