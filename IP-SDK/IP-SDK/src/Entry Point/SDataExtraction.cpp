@@ -1,13 +1,5 @@
-#include <iostream>
-#include <opencv2/opencv.hpp>
-#include <math.h>
-#include <string.h>
-#include <thread>
-#include <DirManager.h>
-#include <Table.h>
-#include <CSVReader.h>
-#include <Image.h>
-#include "ColorConverterGeneric.h"
+
+#include "Pyramid.h"
 
 #define PI 3.14
 
@@ -15,10 +7,14 @@
 #define __get_cr(p) (p.y)
 #define __get_cb(p) (p.z)
 
+
 cv::Mat Grad(cv::Mat& image)
 {
-	cv::Mat ret = image.clone();
+	cv::Mat ret;// = image.clone();
+	cv::Mat tmp;
 	//auto YCrCb = cv::cvtColor(image, cv::COLOR_BGR2YCrCb);
+
+	//cv::resize(image, tmp, cv::Size(image.cols/2, image.rows/2));
 
 	cv::GaussianBlur(image, ret, cv::Size(11, 11), 5, 5);
 
@@ -62,19 +58,19 @@ cv::Mat Grad(cv::Mat& image)
 			intData4& bottom		= ycc[i + 1][j];
 
 
-			int gx_cr = (__get_cr(left_top) + 2 * __get_cr(left) + __get_cr(left_bottom) +
-				(-1) * __get_cr(right_top) + (-2) * __get_cr(right) + (-1) * __get_cr(right_bottom));
+			int gx_cr = (__get_cr(left_top) + 1 * __get_cr(left) + __get_cr(left_bottom) +
+				(-1) * __get_cr(right_top) + (-1) * __get_cr(right) + (-1) * __get_cr(right_bottom));
 
-			int gy_cr = (__get_cr(left_top) + (2) * __get_cr(top) + __get_cr(right_top) +
-				(-1) * __get_cr(left_bottom) + (-2) * __get_cr(bottom) + (-1) * __get_cr(right_bottom));
+			int gy_cr = (__get_cr(left_top) + (1) * __get_cr(top) + __get_cr(right_top) +
+				(-1) * __get_cr(left_bottom) + (-1) * __get_cr(bottom) + (-1) * __get_cr(right_bottom));
 
-			int g_cr = std::sqrt(gx_cr * gx_cr + gy_cr * gy_cr);
+			double g_cr = std::sqrt(gx_cr * gx_cr + gy_cr * gy_cr);
 
-			int gx_cb = (__get_cb(left_top) + 2 * __get_cb(left) + __get_cb(left_bottom) +
-				(-1) * __get_cb(right_top) + (-2) * __get_cb(right) + (-1) * __get_cb(right_bottom));
+			int gx_cb = (__get_cb(left_top) + 1 * __get_cb(left) + __get_cb(left_bottom) +
+				(-1) * __get_cb(right_top) + (-1) * __get_cb(right) + (-1) * __get_cb(right_bottom));
 
-			int gy_cb = (__get_cb(left_top) + (2) * __get_cb(top) + __get_cb(right_top) +
-				(-1) * __get_cb(left_bottom) + (-2) * __get_cb(bottom) + (-1) * __get_cb(right_bottom));
+			int gy_cb = (__get_cb(left_top) + (1) * __get_cb(top) + __get_cb(right_top) +
+				(-1) * __get_cb(left_bottom) + (-1) * __get_cb(bottom) + (-1) * __get_cb(right_bottom));
 
 			double g_cb = std::sqrt(gx_cb * gx_cb + gy_cb * gy_cb);
 
@@ -98,10 +94,11 @@ cv::Mat Grad(cv::Mat& image)
 			int res_int = g_cr;
 			res_int = std::min(res_int, 255);
 
-			if (res_int > 4) {
-				ret.at<cv::Vec3b>(i, j)[0] = res_int; //B
-				ret.at<cv::Vec3b>(i, j)[1] = res_int;	//G
-				ret.at<cv::Vec3b>(i, j)[2] = res_int;	//R
+			int thr = 4;
+			if (res_int > thr) {
+				ret.at<cv::Vec3b>(i, j)[0] = res_int << 5; //B
+				ret.at<cv::Vec3b>(i, j)[1] = res_int << 5;	//G
+				ret.at<cv::Vec3b>(i, j)[2] = res_int << 5;	//R
 			}
 			else {
 				ret.at<cv::Vec3b>(i, j)[0] = 0; //B
@@ -117,19 +114,111 @@ cv::Mat Grad(cv::Mat& image)
 	}
 	delete[] ycc;
 
+	cv::GaussianBlur(ret, ret, cv::Size(21, 21), 5, 5);
 
 	return ret;
 }
 
+std::pair<cv::Mat, cv::Mat> CreateHealingMask(cv::Mat& image100p)
+{
+	cv::Mat image50p;
+	cv::Mat image25p;
+	cv::Mat bilateral_50p;
+	cv::Mat bilateral;
+	cv::Mat mask;
+	cv::Mat mask_shine;
+	cv::resize(image100p, image50p, cv::Size(image100p.cols / 2, image100p.rows / 2));
+	cv::resize(image50p, image25p, cv::Size(image50p.cols / 2, image50p.rows / 2));
+
+	cv::bilateralFilter(image25p, bilateral, 9, 50, 50);
+
+	cv::resize(bilateral, bilateral_50p, cv::Size(image50p.cols, image50p.rows));
+
+
+	cv::subtract(image50p, bilateral_50p, mask_shine);
+	cv::absdiff(image50p, bilateral_50p, mask);
+
+	cv::resize(mask, mask, cv::Size(image100p.cols, image100p.rows));
+	cv::resize(mask_shine, mask_shine, cv::Size(image100p.cols, image100p.rows));
+
+	//for (size_t y = 0; y < image100p.cols; y++)
+	//{
+	//	for (size_t x = 0; x < image100p.rows; x++)
+	//	{
+	//		if (mask_shine.at<cv::Vec3b>(y, x)[0] != 0 || mask_shine.at<cv::Vec3b>(y, x)[1] != 0 || mask_shine.at<cv::Vec3b>(y, x)[2] != 0) {
+	//			mask.at<cv::Vec3b>(y, x)[0] = 0;
+	//			mask.at<cv::Vec3b>(y, x)[1] = 0;
+	//			mask.at<cv::Vec3b>(y, x)[2] = 0;
+	//		}
+	//	}
+	//}
+
+	//cv::add(image100p, mask, mask);
+
+	//cv::namedWindow("image_bliateral", cv::WINDOW_NORMAL);
+	//cv::imshow("image_bliateral", mask);
+
+	return { mask, mask_shine };
+}
+
+cv::Mat ApplyMask(cv::Mat& origin, cv::Mat& mask, cv::Mat& grad, cv::Mat& shine)
+{
+	size_t width = mask.cols;
+	size_t height = mask.rows;
+	cv::Mat ret = origin.clone();
+
+	for (size_t y = 1; y < height - 1; y++)
+	{
+		for (size_t x = 1; x < width - 1; x++)
+		{
+			if (grad.at<cv::Vec3b>(y, x)[0] > 0) {
+				ret.at<cv::Vec3b>(y, x)[0] = std::min(ret.at<cv::Vec3b>(y, x)[0] + mask.at<cv::Vec3b>(y, x)[0], 255); //B
+				ret.at<cv::Vec3b>(y, x)[1] = std::min(ret.at<cv::Vec3b>(y, x)[1] + mask.at<cv::Vec3b>(y, x)[1], 255);	//G
+				ret.at<cv::Vec3b>(y, x)[2] = std::min(ret.at<cv::Vec3b>(y, x)[2] + mask.at<cv::Vec3b>(y, x)[2], 255);	//R
+			}
+		}
+	}
+
+	return ret;
+}
+
+
+int main()
+{
+	cv::Mat image = cv::imread("C:\\Users\\Ghevond\\Desktop\\Code\\Spot_Acne2.jpg");
+	CreatePyramid(image);
+
+	return 0;
+}
+
+
+#if 0
 int main() {	
 	std::cout << "Hello World" << std::endl;
 
-	cv::Mat image = cv::imread("C:\\Users\\Ghevond\\Desktop\\Code\\Spot_Acne3.jpg");
-
 	
+	
+	
+	auto masks = CreateHealingMask(image);
+	cv::Mat grad = Grad(image);
 
-	cv::namedWindow("image", cv::WINDOW_NORMAL);
-	cv::imshow("image", Grad(image));
+	cv::namedWindow("image_origin", cv::WINDOW_NORMAL);
+	cv::imshow("image_origin", image);
+
+	cv::namedWindow("mask_sh", cv::WINDOW_NORMAL);
+	cv::imshow("mask_sh", masks.first);
+
+	cv::namedWindow("mask_shine", cv::WINDOW_NORMAL);
+	cv::imshow("mask_shine", masks.second);
+
+	cv::namedWindow("grad", cv::WINDOW_NORMAL);
+	cv::imshow("grad", grad);
+
+	cv::namedWindow("result", cv::WINDOW_NORMAL);
+	cv::imshow("result", ApplyMask(image, masks.first, grad, masks.second));
+
 	cv::waitKey();
+
 	return 0;
 }
+#endif

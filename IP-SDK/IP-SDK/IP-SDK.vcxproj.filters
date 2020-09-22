@@ -8,6 +8,7 @@
     <ClInclude Include="src\Common\Rect.h" />
     <ClInclude Include="src\Common\Point.h" />
     <ClInclude Include="src\Common\ColorConverterGeneric.h" />
+    <ClInclude Include="src\Common\Pyramid.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Data Structures\Buffer.cpp" />

@@ -22,6 +22,7 @@
     <ClInclude Include="src\Common\ColorConverterGeneric.h" />
     <ClInclude Include="src\Common\GlobalDefines.h" />
     <ClInclude Include="src\Common\Point.h" />
+    <ClInclude Include="src\Common\Pyramid.h" />
     <ClInclude Include="src\Common\Rect.h" />
     <ClInclude Include="src\Data Structures\Buffer.h" />
     <ClInclude Include="src\Data Structures\Image.h" />
