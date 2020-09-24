@@ -7,16 +7,22 @@
 #define __get_cr(p) (p.y)
 #define __get_cb(p) (p.z)
 
+static int MAX_GRAD = 0;
+static int MIN_GRAD = 0;
 
-cv::Mat Grad(cv::Mat& image)
+cv::Mat Grad(cv::Mat& image, bool gaussian = true, bool last_gaussian = true)
 {
 	cv::Mat ret;// = image.clone();
-	cv::Mat tmp;
 	//auto YCrCb = cv::cvtColor(image, cv::COLOR_BGR2YCrCb);
 
 	//cv::resize(image, tmp, cv::Size(image.cols/2, image.rows/2));
 
-	cv::GaussianBlur(image, ret, cv::Size(11, 11), 5, 5);
+	if (gaussian) {
+		cv::GaussianBlur(image, ret, cv::Size(15, 15), 5, 5);
+	}
+	else {
+		ret = image.clone();
+	}
 
 	int w = image.cols;
 	int h = image.rows;
@@ -94,7 +100,9 @@ cv::Mat Grad(cv::Mat& image)
 			int res_int = g_cr;
 			res_int = std::min(res_int, 255);
 
-			int thr = 4;
+
+
+			int thr = 2;
 			if (res_int > thr) {
 				ret.at<cv::Vec3b>(i, j)[0] = res_int << 5; //B
 				ret.at<cv::Vec3b>(i, j)[1] = res_int << 5;	//G
@@ -114,68 +122,16 @@ cv::Mat Grad(cv::Mat& image)
 	}
 	delete[] ycc;
 
-	cv::GaussianBlur(ret, ret, cv::Size(21, 21), 5, 5);
+	if (last_gaussian) {
+		cv::GaussianBlur(ret, ret, cv::Size(11, 11), 2.5, 2.5);
+	}
 
-	return ret;
-}
-
-std::pair<cv::Mat, cv::Mat> CreateHealingMask(cv::Mat& image100p)
-{
-	cv::Mat image50p;
-	cv::Mat image25p;
-	cv::Mat bilateral_50p;
-	cv::Mat bilateral;
-	cv::Mat mask;
-	cv::Mat mask_shine;
-	cv::resize(image100p, image50p, cv::Size(image100p.cols / 2, image100p.rows / 2));
-	cv::resize(image50p, image25p, cv::Size(image50p.cols / 2, image50p.rows / 2));
-
-	cv::bilateralFilter(image25p, bilateral, 9, 50, 50);
-
-	cv::resize(bilateral, bilateral_50p, cv::Size(image50p.cols, image50p.rows));
-
-
-	cv::subtract(image50p, bilateral_50p, mask_shine);
-	cv::absdiff(image50p, bilateral_50p, mask);
-
-	cv::resize(mask, mask, cv::Size(image100p.cols, image100p.rows));
-	cv::resize(mask_shine, mask_shine, cv::Size(image100p.cols, image100p.rows));
-
-	//for (size_t y = 0; y < image100p.cols; y++)
-	//{
-	//	for (size_t x = 0; x < image100p.rows; x++)
-	//	{
-	//		if (mask_shine.at<cv::Vec3b>(y, x)[0] != 0 || mask_shine.at<cv::Vec3b>(y, x)[1] != 0 || mask_shine.at<cv::Vec3b>(y, x)[2] != 0) {
-	//			mask.at<cv::Vec3b>(y, x)[0] = 0;
-	//			mask.at<cv::Vec3b>(y, x)[1] = 0;
-	//			mask.at<cv::Vec3b>(y, x)[2] = 0;
-	//		}
-	//	}
-	//}
-
-	//cv::add(image100p, mask, mask);
-
-	//cv::namedWindow("image_bliateral", cv::WINDOW_NORMAL);
-	//cv::imshow("image_bliateral", mask);
-
-	return { mask, mask_shine };
-}
-
-cv::Mat ApplyMask(cv::Mat& origin, cv::Mat& mask, cv::Mat& grad, cv::Mat& shine)
-{
-	size_t width = mask.cols;
-	size_t height = mask.rows;
-	cv::Mat ret = origin.clone();
-
-	for (size_t y = 1; y < height - 1; y++)
+	for (size_t i = 1; i < h - 1; i++)
 	{
-		for (size_t x = 1; x < width - 1; x++)
+		for (size_t j = 1; j < w - 1; j++)
 		{
-			if (grad.at<cv::Vec3b>(y, x)[0] > 0) {
-				ret.at<cv::Vec3b>(y, x)[0] = std::min(ret.at<cv::Vec3b>(y, x)[0] + mask.at<cv::Vec3b>(y, x)[0], 255); //B
-				ret.at<cv::Vec3b>(y, x)[1] = std::min(ret.at<cv::Vec3b>(y, x)[1] + mask.at<cv::Vec3b>(y, x)[1], 255);	//G
-				ret.at<cv::Vec3b>(y, x)[2] = std::min(ret.at<cv::Vec3b>(y, x)[2] + mask.at<cv::Vec3b>(y, x)[2], 255);	//R
-			}
+			MAX_GRAD = MAX(MAX_GRAD, ret.at<cv::Vec3b>(i, j)[0]);
+			MIN_GRAD = MIN(MIN_GRAD, ret.at<cv::Vec3b>(i, j)[0]);
 		}
 	}
 
@@ -183,10 +139,133 @@ cv::Mat ApplyMask(cv::Mat& origin, cv::Mat& mask, cv::Mat& grad, cv::Mat& shine)
 }
 
 
+void CreateHealingMask()
+{
+	int begin = 1;
+	int end = N - 1;
+
+	for (int i = end; i >= begin; --i)
+	{
+		int current_index = i;
+		int next_index = current_index - 1;
+
+		Level& current = pyramid[current_index];
+		Level& next = pyramid[next_index];
+
+		cv::resize(current._bilateral, next._tmp, cv::Size(next._image.cols, next._image.rows));
+
+		cv::subtract(next._tmp, next._image, next._healing);
+		cv::subtract(next._image, next._tmp, next._shine);
+	}
+
+}
+
+void ApplyMask()
+{
+
+	Level one = GetLevel(0);
+	Level two = GetLevel(1);
+
+	size_t width = one._image.cols;
+	size_t height = one._image.rows;
+
+	cv::resize(two._healing, one._tmp, cv::Size(width, height));
+	cv::resize(two._shine, one._tmp2, cv::Size(width, height));
+
+	cv::Mat origin = one._image.clone();
+	cv::Mat& mask = one._tmp;
+	cv::Mat& shine = one._tmp2;
+	cv::Mat& ret = one._image;
+	cv::Mat& grad = one._grad;
+
+	for (size_t y = 1; y < height - 1; y++)
+	{
+		for (size_t x = 1; x < width - 1; x++)
+		{
+			if (/*shine.at<cv::Vec3b>(y,x)[0] == 0 && shine.at<cv::Vec3b>(y, x)[1] == 0 && shine.at<cv::Vec3b>(y, x)[2] == 0*/true) {
+				//cv::Vec3b ret_pixel = ret.at<cv::Vec3b>(y, x);
+				//cv::Vec3b mask_pixel = mask.at<cv::Vec3b>(y, x);
+				//intData4 ret_ycc = RGBToYCrCb(ret_pixel[2], ret_pixel[1], ret_pixel[0]);
+				//intData4 mask_ycc = RGBToYCrCb(mask_pixel[2], mask_pixel[1], mask_pixel[0]);
+
+				//ret_ycc.y += mask_ycc.y;
+				//ret_ycc.z += mask_ycc.z;
+
+				//intData4 result_rgb = YCrCbToRGB(__get_y(ret_ycc), __get_cr(ret_ycc), __get_cb(ret_ycc), true);
+#if 0
+				int blend_value = grad.at<cv::Vec3b>(y, x)[0];
+				blend_value += (MAX_GRAD - blend_value) / 2;
+				ret.at<cv::Vec3b>(y, x)[0] = std::min(ret.at<cv::Vec3b>(y, x)[0] + mask.at<cv::Vec3b>(y, x)[0] * blend_value / MAX_GRAD, 255); //B
+				ret.at<cv::Vec3b>(y, x)[1] = std::min(ret.at<cv::Vec3b>(y, x)[1] + mask.at<cv::Vec3b>(y, x)[1] * blend_value / MAX_GRAD, 255);	//G
+				ret.at<cv::Vec3b>(y, x)[2] = std::min(ret.at<cv::Vec3b>(y, x)[2] + mask.at<cv::Vec3b>(y, x)[2] * blend_value / MAX_GRAD, 255);	//R
+#else
+				cv::Vec3b ret_pixel = ret.at<cv::Vec3b>(y, x);
+				cv::Vec3b mask_pixel = mask.at<cv::Vec3b>(y, x);
+				intData4 ret_ycc = RGBToYCrCb(ret_pixel[2], ret_pixel[1], ret_pixel[0]);
+				intData4 mask_ycc = RGBToYCrCb(mask_pixel[2], mask_pixel[1], mask_pixel[0]);
+
+				int blend_value = grad.at<cv::Vec3b>(y, x)[0];
+				blend_value += (MAX_GRAD - blend_value) / 2;
+				ret_ycc.y += mask_ycc.y * blend_value / MAX_GRAD;
+				ret_ycc.z += mask_ycc.z * blend_value / MAX_GRAD;
+				//ret_ycc.x = mask_ycc.x * blend_value / MAX_GRAD;
+
+				intData4 result_rgb = YCrCbToRGB(__get_y(ret_ycc), __get_cr(ret_ycc), __get_cb(ret_ycc), true);
+
+				
+				ret.at<cv::Vec3b>(y, x)[0] = result_rgb.z; //B
+				ret.at<cv::Vec3b>(y, x)[1] = result_rgb.y;	//G
+				ret.at<cv::Vec3b>(y, x)[2] = result_rgb.x;	//R
+
+#endif
+			}
+		}
+	}
+
+	cv::namedWindow("image_origin" + std::to_string(0), cv::WINDOW_NORMAL);
+	cv::imshow("image_origin" + std::to_string(0), ret);
+
+	cv::namedWindow("imag" + std::to_string(0), cv::WINDOW_NORMAL);
+	cv::imshow("imag" + std::to_string(0), origin);
+
+}
+
 int main()
 {
-	cv::Mat image = cv::imread("C:\\Users\\Ghevond\\Desktop\\Code\\Spot_Acne2.jpg");
+	cv::Mat image = cv::imread("C:\\Users\\Ghevond\\Desktop\\Code\\Spot.jpg");
 	CreatePyramid(image);
+
+	Iterate([](cv::Mat& image, int index) 
+		{
+			GetLevel(index)._grad = Grad(image, true, true);
+		}, std::unique_ptr<IImageGetter>(new ImageGetter()));
+
+	Iterate([](cv::Mat& image, int index)
+		{
+			cv::bilateralFilter(GetLevel(index)._image, image, 9, 50, 200);
+		}, std::unique_ptr<IImageGetter>(new BilateralGetter()));
+
+	//Iterate([](cv::Mat& image, int index)
+	//	{
+	//		cv::absdiff(GetLevel(index)._image, image, GetLevel(index)._healing);
+	//	}, std::unique_ptr<IImageGetter>(new BilateralGetter()));
+
+	CreateHealingMask();
+	ApplyMask();
+
+	Iterate([](cv::Mat& src, int index) {
+		//if (index == 0 || index == ) return;
+		cv::namedWindow("sdf" + std::to_string(index), cv::WINDOW_NORMAL);
+		cv::imshow("sdf" + std::to_string(index), src);
+		}, std::unique_ptr<IImageGetter>(new GradGetter()));
+
+	//Iterate([](cv::Mat& src, int index) {
+	//	if (index != 0 ) return;
+	//	cv::namedWindow("image_origin" + std::to_string(index), cv::WINDOW_NORMAL);
+	//	cv::imshow("image_origin" + std::to_string(index), src);
+	//	}, std::unique_ptr<IImageGetter>(new HealingGetter()));
+
+	cv::waitKey();
 
 	return 0;
 }
